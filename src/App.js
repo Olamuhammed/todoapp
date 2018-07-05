@@ -8,7 +8,7 @@ class App extends Component {
       this.state = {
         todos: [],
         input: '',
-        editInput:'',
+        editInputs: {},
         showInput : false
       }
     }
@@ -43,18 +43,22 @@ class App extends Component {
    handleShowEdit = (i) => {
      const todos = this.state.todos
      todos[i].showEdit = !todos[i].showEdit
-     this.setState({todos})
+     const editInputs = this.state.editInputs
+     editInputs[i] = todos[i].name
+     this.setState({todos, editInputs})
    }
 
    handleEdit = (i) => {
      const todos = this.state.todos;
-     console.log(this.state.input2, todos[i].name);
-    todos[i].name = this.state.input2;
+    todos[i].name = this.state.editInputs[i]
     this.setState({todos})
+    this.handleShowEdit(i)
    }
 
-   handleEditInput = event => {
-      this.setState({editInput: event.target.value})
+   handleEditInput = (value, index) => {
+    const editInputs = this.state.editInputs
+    editInputs[index] = value
+      this.setState({editInputs})
    }
 
 
@@ -73,7 +77,7 @@ class App extends Component {
           </div>
 
             <ul>
-            { this.state.todos.map((todo,index) => <li>
+            { this.state.todos.map((todo,index) => <li key={index}>
             { !todo.showEdit &&  <div>
                 <input type="checkbox" onChange={() => {this.handleCompleted(index)}} checked={todo.completed} />
                 <span style= {{textDecoration:todo.completed ? 'line-through' : 'none'}}>{todo.name}</span>
@@ -83,8 +87,9 @@ class App extends Component {
             }
 
                 { todo.showEdit &&  <div>
-                    <input placeholder="Enter the change .." onChange={this.handleEditInput} value={todo.name}/>
+                    <input placeholder="Enter the change .." onChange={(e) => this.handleEditInput(e.target.value, index)} value={this.state.editInputs[index]}/>
                     <button onClick={() => {this.handleEdit(index)} }>Save</button>
+                    <button onClick={() => {this.handleShowEdit(index)} }>Cancel</button>
                </div>
              }
               </li>)
